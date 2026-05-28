@@ -1,0 +1,93 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── USER ─────────────────────────────────────────────────────────────────
+// Synced from Clerk via webhook (optional) or created on first solve
+
+model User {
+  id        String   @id               // Clerk user ID (e.g. user_2abc...)
+  email     String   @unique
+  name      String?
+  image     String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// ─── CATEGORY ─────────────────────────────────────────────────────────────
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  papers    Paper[]
+  questions Question[]
+}
+
+// ─── PAPER ────────────────────────────────────────────────────────────────
+
+model Paper {
+  id           String   @id @default(cuid())
+  name         String
+  year         Int
+  fileUrl      String
+  filePublicId String
+  categoryId   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+// ─── QUESTION ─────────────────────────────────────────────────────────────
+
+model Question {
+  id            String     @id @default(cuid())
+  title         String
+  description   String     @db.Text
+  imageUrl      String?
+  imagePublicId String?
+  subject       String
+  chapter       String
+  year          Int
+  difficulty    Difficulty @default(MEDIUM)
+  categoryId    String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  options  Option[]
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// ─── OPTION ───────────────────────────────────────────────────────────────
+
+model Option {
+  id         String  @id @default(cuid())
+  label      String
+  text       String
+  isCorrect  Boolean @default(false)
+  questionId String
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
