@@ -2,11 +2,19 @@ import QuestionRow from "./QuestionRow";
 import type { QuestionWithOptions } from "@/types";
 import { FileQuestion } from "lucide-react";
 
-interface QuestionsListProps {
-  questions: QuestionWithOptions[];
+interface SolveMap {
+  [questionId: string]: { isCorrect: boolean };
 }
 
-export default function QuestionsList({ questions }: QuestionsListProps) {
+interface QuestionsListProps {
+  questions: QuestionWithOptions[];
+  solveMap?: SolveMap;
+}
+
+export default function QuestionsList({
+  questions,
+  solveMap = {},
+}: QuestionsListProps) {
   if (questions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -24,9 +32,18 @@ export default function QuestionsList({ questions }: QuestionsListProps) {
 
   return (
     <div className="divide-y divide-border">
-      {questions.map((question, index) => (
-        <QuestionRow key={question.id} question={question} index={index} />
-      ))}
+      {questions.map((question, index) => {
+        const solve = solveMap[question.id];
+        return (
+          <QuestionRow
+            key={question.id}
+            question={question}
+            index={index}
+            isSolved={!!solve}
+            isCorrect={solve?.isCorrect}
+          />
+        );
+      })}
     </div>
   );
 }

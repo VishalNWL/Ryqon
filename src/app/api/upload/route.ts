@@ -1,6 +1,9 @@
+
+
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { cloudinary } from "@/lib/cloudinary";
+
 
 const ADMIN_EMAILS = [
   process.env.ADMIN_1_EMAIL, // ✅ same as middleware.ts
@@ -9,13 +12,18 @@ const ADMIN_EMAILS = [
 export async function POST(req: NextRequest) {
   try {
     // Auth check
-    const { userId, sessionClaims } = await auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const email = sessionClaims?.email as string | undefined;
-    if (!ADMIN_EMAILS.includes(email ?? "")) {
+    // Admin check using currentUser() — same as middleware
+    const user = await currentUser();
+    const email = user?.emailAddresses[0]?.emailAddress ?? "";
+    
+    console.log("Upload attempt by:", email); // debug — remove after testing
+
+    if (!ADMIN_EMAILS.includes(email)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

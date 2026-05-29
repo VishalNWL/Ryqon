@@ -4,7 +4,15 @@ import QuestionFilters from "@/features/questions/QuestionFilters";
 import QuestionsList from "@/features/questions/QuestionsList";
 import QuestionsSkeleton from "@/features/questions/QuestionsSkeleton";
 import { getQuestions, getFilterOptions } from "@/actions/question";
+import { getUserSolves } from "@/actions/solve";
 import type { QuestionFilter } from "@/types";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Questions — PYQLab",
+  description:
+    "Practice 10,000+ JEE and NEET previous year questions with filters by subject, chapter and year.",
+};
 
 interface QuestionsPageProps {
   searchParams: Promise<{
@@ -16,13 +24,22 @@ interface QuestionsPageProps {
   }>;
 }
 
-async function QuestionsContent({
-  filters,
-}: {
-  filters: QuestionFilter;
-}) {
-  const { data: questions } = await getQuestions(filters);
-  return <QuestionsList questions={questions as any} />;
+async function QuestionsContent({ filters }: { filters: QuestionFilter }) {
+  const [{ data: questions }, { data: solves }] = await Promise.all([
+    getQuestions(filters),
+    getUserSolves(),
+  ]);
+
+  // Build a map of questionId -> solve result for O(1) lookup
+  const solveMap = solves.reduce(
+    (acc, solve) => {
+      acc[solve.questionId] = { isCorrect: solve.isCorrect };
+      return acc;
+    },
+    {} as Record<string, { isCorrect: boolean }>
+  );
+
+  return <QuestionsList questions={questions as any} solveMap={solveMap} />;
 }
 
 export default async function QuestionsPage({
@@ -43,10 +60,8 @@ export default async function QuestionsPage({
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        {/* Page Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1">Previous Year Questions</h1>
           <p className="text-muted-foreground text-sm">
@@ -54,7 +69,6 @@ export default async function QuestionsPage({
           </p>
         </div>
 
-        {/* Filters */}
         <div className="mb-6">
           <QuestionFilters
             categories={filterOptions?.categories ?? []}
@@ -64,10 +78,7 @@ export default async function QuestionsPage({
           />
         </div>
 
-        {/* Questions Table */}
         <div className="rounded-xl border border-border overflow-hidden">
-
-          {/* Table Header */}
           <div className="hidden sm:flex items-center gap-3 px-4 py-3 bg-secondary/50 border-b border-border">
             <span className="w-10 text-xs font-medium text-muted-foreground text-center">
               #
@@ -76,11 +87,10 @@ export default async function QuestionsPage({
               Question
             </span>
             <span className="text-xs font-medium text-muted-foreground shrink-0">
-              Exam / Difficulty
+              Status / Difficulty
             </span>
           </div>
 
-          {/* Questions */}
           <Suspense fallback={<QuestionsSkeleton />}>
             <QuestionsContent filters={filters} />
           </Suspense>

@@ -72,6 +72,7 @@ model Question {
 
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   options  Option[]
+  solves   UserSolve[]
 }
 
 enum Difficulty {
@@ -90,4 +91,18 @@ model Option {
   questionId String
 
   question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+// ─── USER SOLVE HISTORY ───────────────────────────────────────────────────
+
+model UserSolve {
+  id         String   @id @default(cuid())
+  userId     String                          // Clerk user ID
+  questionId String
+  isCorrect  Boolean
+  createdAt  DateTime @default(now())
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])             // one solve record per user per question
 }

@@ -91,7 +91,7 @@ async function QuestionContent({ id }: { id: string }) {
       </div>
 
       {/* MCQ Options */}
-      <MCQOptions options={question.options} />
+      <MCQOptions options={question.options} questionId={question.id} />
 
       {/* Navigation */}
       <Suspense fallback={null}>

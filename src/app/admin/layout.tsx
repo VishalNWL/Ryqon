@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { isAdmin } from "@/lib/auth";
 import AdminSidebar from "@/components/layout/AdminSidebar";
+import AdminMobileHeader from "@/components/layout/AdminMobileHeader";
 
 export default async function AdminLayout({
   children,
@@ -11,13 +12,23 @@ export default async function AdminLayout({
   if (!admin) redirect("/");
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <AdminSidebar />
-      <main className="flex-1 min-w-0">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {children}
+    <div className="min-h-screen bg-background">
+      {/* Mobile header */}
+      <AdminMobileHeader />
+
+      <div className="flex">
+        {/* Desktop sidebar */}
+        <div className="hidden md:block">
+          <AdminSidebar />
         </div>
-      </main>
+
+        {/* Main content */}
+        <main className="flex-1 min-w-0">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

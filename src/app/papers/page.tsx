@@ -2,6 +2,13 @@ import Navbar from "@/components/layout/Navbar";
 import { getPapers } from "@/actions/paper";
 import { getCategories } from "@/actions/category";
 import PapersClient from "@/features/questions/PapersClient";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "PYQ Papers — PYQLab",
+  description:
+    "Download previous year question papers for JEE and NEET as PDF.",
+};
 
 export default async function PapersPage() {
   const [{ data: papers }, { data: categories }] = await Promise.all([

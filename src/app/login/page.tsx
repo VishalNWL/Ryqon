@@ -1,6 +1,12 @@
 import { SignIn } from "@clerk/nextjs";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sign In — PYQLab",
+  description: "Sign in to PYQLab to start solving JEE and NEET questions.",
+};
 
 export default function LoginPage() {
   return (
