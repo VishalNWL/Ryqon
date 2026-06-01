@@ -2,8 +2,18 @@ import Link from "next/link";
 import { getQuestions } from "@/actions/question";
 import { Button } from "@/components/ui/button";
 import DifficultyBadge from "@/components/shared/DifficultyBadge";
-import DeleteQuestionButton from "@/features/admin/DeleteQuestionButton"
+import DeleteQuestionButton from "@/features/admin/DeleteQuestionButton";
 import { Plus, Pencil } from "lucide-react";
+
+type QuestionItem = {
+  id: string;
+  title: string;
+  subject: string;
+  chapter: string;
+  year: number;
+  difficulty: "EASY" | "MEDIUM" | "HARD";
+  category: { name: string };
+};
 
 export default async function AdminQuestionsPage() {
   const { data: questions } = await getQuestions();
@@ -49,7 +59,7 @@ export default async function AdminQuestionsPage() {
           </div>
         ) : (
           <div className="divide-y divide-border">
-            {questions.map((q) => (
+            {(questions as QuestionItem[]).map((q) => (
               <div
                 key={q.id}
                 className="grid grid-cols-1 sm:grid-cols-[1fr_120px_100px_90px_80px] gap-2 sm:gap-4 px-4 py-3 items-center hover:bg-secondary/30 transition-colors"
