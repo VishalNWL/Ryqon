@@ -267,10 +267,10 @@ export default function LandingPage() {
             <div className="w-6 h-6 rounded bg-indigo-600 flex items-center justify-center">
               <BookOpen className="w-3 h-3 text-white" />
             </div>
-            <span className="font-semibold text-sm">PYQLab</span>
+            <span className="font-semibold text-sm">Ryqon</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © 2024 PYQLab. Built for JEE & NEET aspirants.
+            © 2026 Ryqon. Built for JEE & NEET aspirants.
           </p>
         </div>
       </footer>

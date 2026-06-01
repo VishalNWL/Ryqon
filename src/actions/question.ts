@@ -79,15 +79,15 @@ export async function getFilterOptions() {
       }),
     ]);
 
-    return {
-      success: true,
-      data: {
-        categories,
-        subjects: subjects.map((q) => q.subject),
-        chapters: chapters.map((q) => q.chapter),
-        years: years.map((q) => q.year),
-      },
-    };
+   return {
+  success: true,
+  data: {
+    categories,
+    subjects: subjects.map((q: { subject: string }) => q.subject),
+    chapters: chapters.map((q: { chapter: string }) => q.chapter),
+    years: years.map((q: { year: number }) => q.year),
+  },
+};
   } catch (error) {
     console.error("getFilterOptions error:", error);
     return {

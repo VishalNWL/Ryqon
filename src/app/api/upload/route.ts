@@ -6,7 +6,7 @@ import { cloudinary } from "@/lib/cloudinary";
 
 
 const ADMIN_EMAILS = [
-  process.env.ADMIN_1_EMAIL, // ✅ same as middleware.ts
+  process.env.ADMIN_1_EMAIL, // same as middleware.ts
 ];
 
 export async function POST(req: NextRequest) {
