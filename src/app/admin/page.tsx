@@ -3,20 +3,18 @@ import { FileQuestion, Tags, FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import DifficultyBadge from "@/components/shared/DifficultyBadge";
-import { currentUser } from "@clerk/nextjs/server";
-import { isAdmin } from "@/lib/auth";
+
+type RecentQuestion = {
+  id: string;
+  title: string;
+  subject: string;
+  chapter: string;
+  year: number;
+  difficulty: "EASY" | "MEDIUM" | "HARD";
+  category: { name: string };
+};
 
 export default async function AdminDashboard() {
-  // DEBUG — remove after fixing
-  const user = await currentUser();
-  console.log("CURRENT USER EMAIL:", user?.emailAddresses[0]?.emailAddress);
-  console.log("CURRENT USER ID:", user?.id);
-
-  const admin = await isAdmin();
-  console.log("IS ADMIN:", admin);
-  // END DEBUG
-
-
   const result = await getAdminStats();
   const stats = result.data;
 
@@ -71,8 +69,10 @@ export default async function AdminDashboard() {
                 <span className="text-sm text-muted-foreground font-medium">
                   {card.label}
                 </span>
-                <div className={`w-9 h-9 rounded-lg ${card.color} flex items-center justify-center`}>
-                  <card.icon className="w-4.5 h-4.5" />
+                <div
+                  className={`w-9 h-9 rounded-lg ${card.color} flex items-center justify-center`}
+                >
+                  <card.icon className="w-4 h-4" />
                 </div>
               </div>
               <p className="text-3xl font-bold">{card.value}</p>
@@ -96,17 +96,17 @@ export default async function AdminDashboard() {
           {!stats?.recentQuestions?.length ? (
             <div className="p-8 text-center text-muted-foreground text-sm">
               No questions yet.{" "}
-              <Link href="/admin/questions/new" className="text-indigo-600 hover:underline">
+              <Link
+                href="/admin/questions/new"
+                className="text-indigo-600 hover:underline"
+              >
                 Add your first question
               </Link>
             </div>
           ) : (
             <div className="divide-y divide-border">
-              {stats.recentQuestions.map((q) => (
-                <div
-                  key={q.id}
-                  className="flex items-center gap-3 px-4 py-3"
-                >
+              {(stats.recentQuestions as RecentQuestion[]).map((q) => (
+                <div key={q.id} className="flex items-center gap-3 px-4 py-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{q.title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
