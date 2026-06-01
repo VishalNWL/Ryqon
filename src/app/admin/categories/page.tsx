@@ -2,6 +2,14 @@ import { getCategories } from "@/actions/category";
 import AddCategoryForm from "@/features/admin/AddCategoryForm";
 import DeleteCategoryButton from "@/features/admin/DeleteCategoryButton";
 import { Tags } from "lucide-react";
+import type { Category } from "@prisma/client";
+
+type CategoryWithCount = Category & {
+  _count: {
+    questions: number;
+    papers: number;
+  };
+};
 
 export default async function CategoriesPage() {
   const { data: categories } = await getCategories();
@@ -37,7 +45,7 @@ export default async function CategoriesPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {categories.map((cat) => (
+              {(categories as CategoryWithCount[]).map((cat) => (
                 <div
                   key={cat.id}
                   className="flex items-center justify-between p-4 rounded-xl border border-border bg-card"
