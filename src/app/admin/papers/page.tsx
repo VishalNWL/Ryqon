@@ -4,6 +4,27 @@ import UploadPaperForm from "@/features/admin/UploadPaperForm";
 import DeletePaperButton from "@/features/admin/DeletePaperButton";
 import { FileText, ExternalLink } from "lucide-react";
 
+type PaperWithCategory = {
+  id: string;
+  name: string;
+  year: number;
+  fileUrl: string;
+  filePublicId: string;
+  categoryId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  category: { name: string };
+};
+
+type CategoryItem = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export default async function AdminPapersPage() {
   const [{ data: papers }, { data: categories }] = await Promise.all([
     getPapers(),
@@ -20,12 +41,11 @@ export default async function AdminPapersPage() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
-
         {/* Upload Form */}
         <div>
           <h2 className="font-semibold mb-4">Upload New Paper</h2>
           <div className="rounded-xl border border-border p-5 bg-card">
-            <UploadPaperForm categories={categories as any} />
+            <UploadPaperForm categories={categories as CategoryItem[]} />
           </div>
         </div>
 
@@ -44,7 +64,7 @@ export default async function AdminPapersPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {papers.map((paper) => (
+              {(papers as PaperWithCategory[]).map((paper) => (
                 <div
                   key={paper.id}
                   className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card"
