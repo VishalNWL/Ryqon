@@ -2,9 +2,14 @@ import { getCategories } from "@/actions/category";
 import AddCategoryForm from "@/features/admin/AddCategoryForm";
 import DeleteCategoryButton from "@/features/admin/DeleteCategoryButton";
 import { Tags } from "lucide-react";
-import type { Category } from "@prisma/client";
 
-type CategoryWithCount = Category & {
+type CategoryWithCount = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
   _count: {
     questions: number;
     papers: number;
@@ -24,13 +29,11 @@ export default async function CategoriesPage() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
-        {/* Add Category Form */}
         <div>
           <h2 className="font-semibold mb-4">Add New Category</h2>
           <AddCategoryForm />
         </div>
 
-        {/* Existing Categories */}
         <div>
           <h2 className="font-semibold mb-4">
             Existing Categories ({categories.length})
