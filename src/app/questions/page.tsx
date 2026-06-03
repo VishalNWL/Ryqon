@@ -31,13 +31,13 @@ async function QuestionsContent({ filters }: { filters: QuestionFilter }) {
   ]);
 
   // Build a map of questionId -> solve result for O(1) lookup
-  const solveMap = solves.reduce(
-    (acc, solve) => {
-      acc[solve.questionId] = { isCorrect: solve.isCorrect };
-      return acc;
-    },
-    {} as Record<string, { isCorrect: boolean }>
-  );
+const solveMap = solves.reduce<Record<string, { isCorrect: boolean }>>(
+  (acc, solve) => {
+    acc[solve.questionId] = { isCorrect: solve.isCorrect };
+    return acc;
+  },
+  {}
+);
 
   return <QuestionsList questions={questions as any} solveMap={solveMap} />;
 }
