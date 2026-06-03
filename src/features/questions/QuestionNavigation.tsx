@@ -13,11 +13,11 @@ export default async function QuestionNavigation({
   categoryId,
 }: QuestionNavigationProps) {
   // Get all question IDs in same category ordered by year desc
-  const questions = await prisma.question.findMany({
-    where: { categoryId },
-    select: { id: true },
-    orderBy: [{ year: "desc" }, { createdAt: "desc" }],
-  });
+const questions: { id: string }[] = await prisma.question.findMany({
+  where: { categoryId },
+  select: { id: true },
+  orderBy: [{ year: "desc" }, { createdAt: "desc" }],
+});
 
   const currentIndex = questions.findIndex((q) => q.id === currentId);
   const prevQuestion = currentIndex > 0 ? questions[currentIndex - 1] : null;
