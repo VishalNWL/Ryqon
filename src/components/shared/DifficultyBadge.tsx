@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { Difficulty } from "@prisma/client";
+import type { Difficulty } from "@/types";
 
 interface DifficultyBadgeProps {
   difficulty: Difficulty;
