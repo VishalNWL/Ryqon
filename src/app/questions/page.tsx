@@ -25,22 +25,21 @@ interface QuestionsPageProps {
 }
 
 async function QuestionsContent({ filters }: { filters: QuestionFilter }) {
-  const [{ data: questions }, { data: solves }] = await Promise.all([
+  const [{ data: questions }, { data: solvesData }] = await Promise.all([
     getQuestions(filters),
     getUserSolves(),
   ]);
 
-  // Build a map of questionId -> solve result for O(1) lookup
-const solveMap = solves.reduce<Record<string, { isCorrect: boolean }>>(
-  (acc, solve) => {
-    acc[solve.questionId] = { isCorrect: solve.isCorrect };
-    return acc;
-  },
-  {}
-);
+  const solves = (solvesData ?? []) as { questionId: string; isCorrect: boolean }[];
+
+  const solveMap: Record<string, { isCorrect: boolean }> = {};
+  for (const solve of solves) {
+    solveMap[solve.questionId] = { isCorrect: solve.isCorrect };
+  }
 
   return <QuestionsList questions={questions as any} solveMap={solveMap} />;
 }
+
 
 export default async function QuestionsPage({
   searchParams,
