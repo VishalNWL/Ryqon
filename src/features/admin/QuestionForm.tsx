@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
-import type { Category, Question, Option } from "@prisma/client";
+import type { Category, Question, Option } from "@/types";
 
 interface QuestionFormProps {
   categories: Category[];

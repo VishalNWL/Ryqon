@@ -15,7 +15,7 @@ import {
 import { toast } from "sonner";
 import { Loader2, Upload, FileText, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Category } from "@prisma/client";
+import type { Category } from "@/types";
 
 interface UploadPaperFormProps {
   categories: Category[];

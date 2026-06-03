@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
-import type { Category } from "@prisma/client";
+import type { Category } from "@/types"
 
 interface QuestionFiltersProps {
   categories: Category[];

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { saveUserSolve } from "@/actions/solve";
-import type { Option } from "@prisma/client";
+import type { Option } from "@/types";
 
 interface MCQOptionsProps {
   options: Option[];

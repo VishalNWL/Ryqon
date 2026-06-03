@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, Download, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { PaperWithCategory } from "@/types";
-import type { Category } from "@prisma/client";
+import type { Category } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface PapersClientProps {
