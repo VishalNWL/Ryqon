@@ -118,25 +118,27 @@ export async function createQuestion(formData: FormData) {
       return { success: false, error: "All fields are required" };
     }
 
-    const question = await prisma.question.create({
-      data: {
-        title: title.trim(),
-        description: description.trim(),
-        subject: subject.trim(),
-        chapter: chapter.trim(),
-        year: Number(year),
-        difficulty: difficulty as any,
-        categoryId,
-        options: {
-          create: [
-            { label: "A", text: optionA.trim(), isCorrect: correctAnswer === "A" },
-            { label: "B", text: optionB.trim(), isCorrect: correctAnswer === "B" },
-            { label: "C", text: optionC.trim(), isCorrect: correctAnswer === "C" },
-            { label: "D", text: optionD.trim(), isCorrect: correctAnswer === "D" },
-          ],
-        },
-      },
-    });
+  const question = await prisma.question.create({
+  data: {
+    title: title.trim(),
+    description: description.trim(),
+    subject: subject.trim(),
+    chapter: chapter.trim(),
+    year: Number(year),
+    difficulty: difficulty as any,
+    categoryId,
+    imageUrl: (formData.get("imageUrl") as string) || null,
+    imagePublicId: (formData.get("imagePublicId") as string) || null,
+    options: {
+      create: [
+        { label: "A", text: optionA.trim(), isCorrect: correctAnswer === "A" },
+        { label: "B", text: optionB.trim(), isCorrect: correctAnswer === "B" },
+        { label: "C", text: optionC.trim(), isCorrect: correctAnswer === "C" },
+        { label: "D", text: optionD.trim(), isCorrect: correctAnswer === "D" },
+      ],
+    },
+  },
+});
 
     revalidatePath("/admin/questions");
     revalidatePath("/questions");
@@ -167,26 +169,28 @@ export async function updateQuestion(id: string, formData: FormData) {
     // Delete old options and recreate
     await prisma.option.deleteMany({ where: { questionId: id } });
 
-    const question = await prisma.question.update({
-      where: { id },
-      data: {
-        title: title.trim(),
-        description: description.trim(),
-        subject: subject.trim(),
-        chapter: chapter.trim(),
-        year: Number(year),
-        difficulty: difficulty as any,
-        categoryId,
-        options: {
-          create: [
-            { label: "A", text: optionA.trim(), isCorrect: correctAnswer === "A" },
-            { label: "B", text: optionB.trim(), isCorrect: correctAnswer === "B" },
-            { label: "C", text: optionC.trim(), isCorrect: correctAnswer === "C" },
-            { label: "D", text: optionD.trim(), isCorrect: correctAnswer === "D" },
-          ],
-        },
-      },
-    });
+   const question = await prisma.question.update({
+  where: { id },
+  data: {
+    title: title.trim(),
+    description: description.trim(),
+    subject: subject.trim(),
+    chapter: chapter.trim(),
+    year: Number(year),
+    difficulty: difficulty as any,
+    categoryId,
+    imageUrl: (formData.get("imageUrl") as string) || null,
+    imagePublicId: (formData.get("imagePublicId") as string) || null,
+    options: {
+      create: [
+        { label: "A", text: optionA.trim(), isCorrect: correctAnswer === "A" },
+        { label: "B", text: optionB.trim(), isCorrect: correctAnswer === "B" },
+        { label: "C", text: optionC.trim(), isCorrect: correctAnswer === "C" },
+        { label: "D", text: optionD.trim(), isCorrect: correctAnswer === "D" },
+      ],
+    },
+  },
+});
 
     revalidatePath("/admin/questions");
     revalidatePath("/questions");

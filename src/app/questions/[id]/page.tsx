@@ -61,7 +61,7 @@ async function QuestionContent({ id }: { id: string }) {
         </div>
 
         {/* Timer */}
-        <QuestionTimer />
+        {/* <QuestionTimer />  to enable the timer uncomment this*/}
       </div>
 
       {/* Question Card */}
@@ -77,15 +77,22 @@ async function QuestionContent({ id }: { id: string }) {
         )}
 
         {/* Optional image */}
+       {/* Optional image — scaled down */}
         {question.imageUrl && (
-          <div className="relative w-full max-h-64 rounded-lg overflow-hidden border border-border">
-            <Image
-              src={question.imageUrl}
-              alt="Question diagram"
-              width={700}
-              height={300}
-              className="object-contain w-full"
-            />
+          <div className="rounded-xl overflow-hidden border border-border bg-secondary/20 p-3">
+            <div className="relative w-full max-h-72">
+              <Image
+                src={question.imageUrl}
+                alt="Question diagram"
+                width={800}
+                height={400}
+                className="object-contain w-full max-h-72 rounded-lg"
+                style={{ maxWidth: "100%", height: "auto" }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Figure: Refer to the diagram above
+            </p>
           </div>
         )}
       </div>

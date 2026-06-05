@@ -68,7 +68,7 @@ const features = [
   },
   {
     icon: Zap,
-    title: "LeetCode-style UI",
+    title: "Simple UI",
     description: "Clean problem-solving interface designed for focused practice.",
     color: "text-yellow-600 bg-yellow-50",
   },
