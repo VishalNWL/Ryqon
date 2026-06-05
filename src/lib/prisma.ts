@@ -1,4 +1,4 @@
-import { PrismaClient } from ".prisma/client/default";
+import { PrismaClient } from "../../node_modules/.prisma/client/default";
 import { PrismaNeon } from "@prisma/adapter-neon";
 
 declare global {
