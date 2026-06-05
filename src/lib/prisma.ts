@@ -1,14 +1,12 @@
 import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaClient } from "@prisma/client/default";
 
 declare global {
   // eslint-disable-next-line no-var
-  var prisma: any;
+  var prisma: PrismaClient | undefined;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient } = require("@prisma/client");
-
-function createPrismaClient() {
+function createPrismaClient(): PrismaClient {
   const adapter = new PrismaNeon({
     connectionString: process.env.DATABASE_URL!,
   });
