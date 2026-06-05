@@ -18,9 +18,9 @@
         "name": "next"
       }
     ],
+     "typeRoots": ["./node_modules/@types", "./node_modules/.prisma"],
     "paths": {
-      "@/*": ["./src/*"],
-      ".prisma/client/default": ["./node_modules/.prisma/client/default"]
+            "@/*": ["./src/*"],
     }
   },
   "include": [

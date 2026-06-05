@@ -13,6 +13,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      ".prisma/client/default": require.resolve(".prisma/client/default"),
+    };
+    return config;
+  },
 };
 
 export default nextConfig;
