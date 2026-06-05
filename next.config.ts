@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {},
   images: {
     remotePatterns: [
       {
@@ -12,13 +13,6 @@ const nextConfig: NextConfig = {
         hostname: "img.clerk.com",
       },
     ],
-  },
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      ".prisma/client/default": require.resolve(".prisma/client/default"),
-    };
-    return config;
   },
 };
 
