@@ -3,7 +3,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { cloudinary } from "@/lib/cloudinary";
 
 const ADMIN_EMAILS = [
-  process.env.ADMIN_1_EMAIL // ✅ your exact email here
+  process.env.ADMIN_1_EMAIL ,// ✅ your exact email here
+  process.env.ADMIN_2_EMAIL
 ];
 
 export async function POST(req: NextRequest) {

@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 
 const ADMIN_EMAILS = [
   process.env.ADMIN_1_EMAIL, // ✅ your exact Gmail here
+  process.env.ADMIN_2_EMAIL
 ];
 
 export async function getCurrentUser() {
