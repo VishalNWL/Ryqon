@@ -12,7 +12,10 @@ const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
 const ADMIN_EMAILS = [
   process.env.ADMIN_1_EMAIL,
-  process.env.ADMIN_2_EMAIL
+  process.env.ADMIN_2_EMAIL,
+  process.env.ADMIN_3_EMAIL,
+  process.env.ADMIN_4_EMAIL,
+  process.env.ADMIN_5_EMAIL
 ];
 
 export default clerkMiddleware(async (auth, req) => {
