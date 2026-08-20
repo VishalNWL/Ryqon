@@ -15,7 +15,8 @@ const ADMIN_EMAILS = [
   process.env.ADMIN_2_EMAIL,
   process.env.ADMIN_3_EMAIL,
   process.env.ADMIN_4_EMAIL,
-  process.env.ADMIN_5_EMAIL
+  process.env.ADMIN_5_EMAIL,
+  process.env.ADMIN_7_EMAIL
 ];
 
 export default clerkMiddleware(async (auth, req) => {
@@ -33,14 +34,14 @@ export default clerkMiddleware(async (auth, req) => {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
     const email = user?.emailAddresses[0]?.emailAddress ?? "";
-    // console.log("🔐 Admin check — email:", email);
+    // console.log(" Admin check — email:", email);
 
     if (!ADMIN_EMAILS.includes(email)) {
-      // console.log("❌ Not admin, redirecting home");
+      // console.log(" Not admin, redirecting home");
       return NextResponse.redirect(new URL("/", req.url));
     }
 
-    // console.log("✅ Admin access granted");
+    // console.log("Admin access granted");
   }
 });
 

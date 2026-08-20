@@ -1,11 +1,12 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 
 const ADMIN_EMAILS = [
-  process.env.ADMIN_1_EMAIL, // ✅ your exact Gmail here
+  process.env.ADMIN_1_EMAIL, //  your exact Gmail here
   process.env.ADMIN_2_EMAIL,
   process.env.ADMIN_3_EMAIL,
   process.env.ADMIN_4_EMAIL,
-  process.env.ADMIN_5_EMAIL
+  process.env.ADMIN_5_EMAIL,
+  process.env.ADMIN_7_EMAIL
 ];
 
 export async function getCurrentUser() {
@@ -24,7 +25,7 @@ export async function isAdmin() {
   const user = await currentUser();
   if (!user) return false;
   const email = user.emailAddresses[0]?.emailAddress ?? "";
-  // console.log("🔍 isAdmin check — email:", email);
+  // console.log(" isAdmin check — email:", email);
   return ADMIN_EMAILS.includes(email);
 }
 
@@ -37,6 +38,6 @@ export async function requireAuth() {
 
 export async function requireAdmin() {
   const admin = await isAdmin();
-  // console.log("🔍 requireAdmin result:", admin);
+  // console.log("requireAdmin result:", admin);
   if (!admin) throw new Error("Forbidden");
 }

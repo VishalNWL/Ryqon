@@ -10,7 +10,8 @@ const ADMIN_EMAILS = [
   process.env.ADMIN_2_EMAIL,
   process.env.ADMIN_3_EMAIL,
   process.env.ADMIN_4_EMAIL,
-  process.env.ADMIN_5_EMAIL
+  process.env.ADMIN_5_EMAIL,
+  process.env.ADMIN_7_EMAIL
 ];
 
 export async function POST(req: NextRequest) {
