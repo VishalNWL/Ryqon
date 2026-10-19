@@ -11,7 +11,9 @@ export async function saveUserSolve(questionId: string, isCorrect: boolean) {
     // upsert — update if already solved, create if not
     await prisma.userSolve.upsert({
       where: { userId_questionId: { userId, questionId } },
-      update: { isCorrect },
+      update: isCorrect
+        ? { isCorrect: true, createdAt: new Date() }
+        : { isCorrect: false },
       create: { userId, questionId, isCorrect },
     });
 
