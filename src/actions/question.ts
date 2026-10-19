@@ -5,6 +5,88 @@ import { requireAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import type { QuestionFilter } from "@/types";
 
+const QUESTION_IMPORT_HEADERS = [
+  "title",
+  "description",
+  "subject",
+  "chapter",
+  "year",
+  "difficulty",
+  "category",
+  "optionA",
+  "optionB",
+  "optionC",
+  "optionD",
+  "correctAnswer",
+];
+const MAX_IMPORT_FILE_SIZE = 500 * 1024;
+const MAX_IMPORT_ROWS = 200;
+
+function parseCsv(content: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let inQuotes = false;
+  let afterQuote = false;
+
+  for (let index = 0; index < content.length; index += 1) {
+    const character = content[index];
+    const nextCharacter = content[index + 1];
+
+    if (inQuotes) {
+      if (character === '"' && nextCharacter === '"') {
+        field += '"';
+        index += 1;
+      } else if (character === '"') {
+        inQuotes = false;
+        afterQuote = true;
+      } else {
+        field += character;
+      }
+      continue;
+    }
+
+    if (
+      afterQuote &&
+      character !== "," &&
+      character !== "\r" &&
+      character !== "\n" &&
+      character !== " "
+    ) {
+      throw new Error("Unexpected character after a quoted CSV value.");
+    }
+
+    if (character === '"' && field.length === 0 && !afterQuote) {
+      inQuotes = true;
+    } else if (character === '"') {
+      throw new Error("A quote in a CSV value must be escaped or enclose the entire value.");
+    } else if (character === ",") {
+      row.push(field.trim());
+      field = "";
+      afterQuote = false;
+    } else if (character === "\r" || character === "\n") {
+      row.push(field.trim());
+      if (row.some((value) => value.length > 0)) rows.push(row);
+      row = [];
+      field = "";
+      afterQuote = false;
+      if (character === "\r" && nextCharacter === "\n") index += 1;
+    } else if (!afterQuote) {
+      field += character;
+    }
+  }
+
+  if (inQuotes) {
+    throw new Error("A quoted CSV value was not closed.");
+  }
+  if (field.length > 0 || row.length > 0) {
+    row.push(field.trim());
+    if (row.some((value) => value.length > 0)) rows.push(row);
+  }
+
+  return rows;
+}
+
 export async function getQuestions(filters: QuestionFilter = {}) {
   try {
     const { exam, subject, chapter, year, search } = filters;
@@ -37,6 +119,190 @@ export async function getQuestions(filters: QuestionFilter = {}) {
   } catch (error) {
     console.error("getQuestions error:", error);
     return { success: false, data: [], error: "Failed to fetch questions" };
+  }
+}
+
+export async function importQuestions(formData: FormData) {
+  try {
+    await requireAdmin();
+
+    const file = formData.get("file");
+    if (!(file instanceof File) || file.size === 0) {
+      return { success: false, error: "Choose a CSV file to import." };
+    }
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      return { success: false, error: "The selected file must be a CSV." };
+    }
+    if (file.size > MAX_IMPORT_FILE_SIZE) {
+      return { success: false, error: "CSV files must be 500 KB or smaller." };
+    }
+
+    const content = (await file.text()).replace(/^\uFEFF/, "");
+    let rows: string[][];
+    try {
+      rows = parseCsv(content);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "The CSV format is invalid.",
+      };
+    }
+
+    if (rows.length < 2) {
+      return {
+        success: false,
+        error: "The CSV must include a header and at least one question.",
+      };
+    }
+
+    const headers = rows[0].map((header) => header.toLowerCase());
+    if (
+      headers.length !== QUESTION_IMPORT_HEADERS.length ||
+      !QUESTION_IMPORT_HEADERS.every((header, index) => headers[index] === header.toLowerCase())
+    ) {
+      return {
+        success: false,
+        error: `CSV headers must be: ${QUESTION_IMPORT_HEADERS.join(", ")}`,
+      };
+    }
+
+    const dataRows = rows.slice(1);
+    if (dataRows.length > MAX_IMPORT_ROWS) {
+      return {
+        success: false,
+        error: `A maximum of ${MAX_IMPORT_ROWS} questions can be imported at once.`,
+      };
+    }
+
+    const categories = await prisma.category.findMany({
+      select: { id: true, name: true, slug: true },
+    });
+    const categoryIds = new Map<string, string>();
+    for (const category of categories) {
+      categoryIds.set(category.name.trim().toLowerCase(), category.id);
+      categoryIds.set(category.slug.trim().toLowerCase(), category.id);
+    }
+
+    const errors: string[] = [];
+    const questions = [];
+
+    for (const [index, values] of dataRows.entries()) {
+      const rowNumber = index + 2;
+      if (values.length !== QUESTION_IMPORT_HEADERS.length) {
+        errors.push(
+          `Row ${rowNumber}: expected ${QUESTION_IMPORT_HEADERS.length} columns, found ${values.length}.`
+        );
+        continue;
+      }
+
+      const [
+        title,
+        description,
+        subject,
+        chapter,
+        yearValue,
+        difficultyValue,
+        categoryValue,
+        optionA,
+        optionB,
+        optionC,
+        optionD,
+        correctAnswerValue,
+      ] = values;
+      const missingFields = [
+        ["title", title],
+        ["description", description],
+        ["subject", subject],
+        ["chapter", chapter],
+        ["year", yearValue],
+        ["difficulty", difficultyValue],
+        ["category", categoryValue],
+        ["optionA", optionA],
+        ["optionB", optionB],
+        ["optionC", optionC],
+        ["optionD", optionD],
+        ["correctAnswer", correctAnswerValue],
+      ]
+        .filter(([, value]) => !value)
+        .map(([name]) => name);
+
+      const rowErrors: string[] = [];
+      if (missingFields.length > 0) {
+        rowErrors.push(`missing ${missingFields.join(", ")}`);
+      }
+
+      const year = Number(yearValue);
+      if (yearValue && (!Number.isInteger(year) || year < 1900 || year > 2100)) {
+        rowErrors.push("year must be a whole number from 1900 to 2100");
+      }
+
+      const difficulty = difficultyValue.toUpperCase();
+      if (difficultyValue && !["EASY", "MEDIUM", "HARD"].includes(difficulty)) {
+        rowErrors.push("difficulty must be EASY, MEDIUM, or HARD");
+      }
+
+      const correctAnswer = correctAnswerValue.toUpperCase();
+      if (correctAnswerValue && !["A", "B", "C", "D"].includes(correctAnswer)) {
+        rowErrors.push("correctAnswer must be A, B, C, or D");
+      }
+
+      const categoryId = categoryIds.get(categoryValue.toLowerCase());
+      if (categoryValue && !categoryId) {
+        rowErrors.push(
+          `category "${categoryValue}" does not match an existing category name or slug`
+        );
+      }
+
+      if (rowErrors.length > 0) {
+        errors.push(`Row ${rowNumber}: ${rowErrors.join("; ")}.`);
+        continue;
+      }
+      if (!categoryId) {
+        errors.push(`Row ${rowNumber}: category "${categoryValue}" does not match an existing category name or slug.`);
+        continue;
+      }
+
+      questions.push({
+        title,
+        description,
+        subject,
+        chapter,
+        year,
+        difficulty: difficulty as "EASY" | "MEDIUM" | "HARD",
+        categoryId,
+        options: [optionA, optionB, optionC, optionD].map((text, optionIndex) => ({
+          label: String.fromCharCode(65 + optionIndex),
+          text,
+          isCorrect: correctAnswer === String.fromCharCode(65 + optionIndex),
+        })),
+      });
+    }
+
+    if (errors.length > 0) {
+      return {
+        success: false,
+        error: "No questions were imported. Fix the CSV errors and try again.",
+        rowErrors: errors,
+      };
+    }
+
+    await prisma.$transaction(
+      questions.map(({ options, ...question }) =>
+        prisma.question.create({
+          data: {
+            ...question,
+            options: { create: options },
+          },
+        })
+      )
+    );
+
+    revalidatePath("/admin/questions");
+    revalidatePath("/questions");
+    return { success: true, importedCount: questions.length };
+  } catch (error) {
+    console.error("importQuestions error:", error);
+    return { success: false, error: "Failed to import questions. No questions were saved." };
   }
 }
 

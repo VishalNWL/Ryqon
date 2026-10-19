@@ -3,7 +3,7 @@ import { getQuestions } from "@/actions/question";
 import { Button } from "@/components/ui/button";
 import DifficultyBadge from "@/components/shared/DifficultyBadge";
 import DeleteQuestionButton from "@/features/admin/DeleteQuestionButton";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, FileUp } from "lucide-react";
 
 type QuestionItem = {
   id: string;
@@ -27,12 +27,20 @@ export default async function AdminQuestionsPage() {
             {questions.length} questions total
           </p>
         </div>
-        <Link href="/admin/questions/new">
-          <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
-            <Plus className="w-4 h-4" />
-            Add Question
-          </Button>
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/admin/questions/import">
+            <Button variant="outline" className="gap-2">
+              <FileUp className="w-4 h-4" />
+              Bulk Import
+            </Button>
+          </Link>
+          <Link href="/admin/questions/new">
+            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
+              <Plus className="w-4 h-4" />
+              Add Question
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="rounded-xl border border-border overflow-hidden">
