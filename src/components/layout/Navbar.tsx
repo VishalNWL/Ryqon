@@ -11,6 +11,7 @@ import { useState } from "react";
 const navLinks = [
   { href: "/questions", label: "Questions" },
   { href: "/papers", label: "PYQ Papers" },
+  { href: "/profile", label: "Profile" },
 ];
 
 export default function Navbar() {
